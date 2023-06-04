@@ -1,3 +1,6 @@
 package model
 
-data class Card(val value: Int, val suit: Int);
+import model.enums.Suit
+import model.enums.Value
+
+data class Card(val suit: Suit, val value: Value);
