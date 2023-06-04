@@ -4,9 +4,9 @@ enum class Value {
     SEVEN,
     EIGHT,
     NINE,
-    TEN,
     JACK,
     QUEEN,
     KING,
+    TEN,
     ACE
 }
