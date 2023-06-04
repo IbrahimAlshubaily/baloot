@@ -8,6 +8,6 @@ fun main() {
     4- model.Player
     5- Score board
      */
-    println("Hello model.Baloot!")
+    println("Hello Baloot!")
     Baloot()
 }
