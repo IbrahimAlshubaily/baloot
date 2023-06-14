@@ -4,12 +4,8 @@ import model.enums.Suit
 import model.enums.Value
 
 class Deck {
-    val cards = arrayOfNulls<Card>(32)
-    var nextCardIdx: Int = 0
-
-    init {
-        initDeck()
-    }
+    val cards = initDeck()
+    private var nextCardIdx: Int = 0
 
     fun getCards(n: Int): List<Card> {
         nextCardIdx += n
@@ -20,8 +16,9 @@ class Deck {
     }
 
 
-    private fun initDeck() {
+    private fun initDeck(): MutableList<Card?> {
         var idx = 0
+        val cards = arrayOfNulls<Card>(32)
         for (suit in Suit.values()){
             for (value in Value.values()){
                 cards[idx++] = Card(suit, value)
@@ -29,9 +26,6 @@ class Deck {
         }
         nextCardIdx = 0
         cards.shuffle()
-    }
-
-    fun reset() {
-        initDeck()
+        return cards.toMutableList()
     }
 }

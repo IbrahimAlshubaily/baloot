@@ -1,36 +1,46 @@
 package model
 
-import java.util.*
+import java.util.Arrays
+
 
 class Baloot {
-    val dealer = Dealer()
-    val players = initPlayers()
+    private val dealer = Dealer()
+    private val players = List<MutableSet<Card>>(4) {
+        mutableSetOf()
+    }
+
     init {
         deal()
-        play()
+        rollOut()
     }
 
     private fun deal() {
         for (player in players) {
-            player.setCards(dealer.dealHand())
+            player.addAll(dealer.dealHand())
         }
     }
-    private fun play() {
-        println("START")
+    private fun rollOut() {
         var startIdx = 0
-        var currentRoundCards = arrayOfNulls<Card>(4)
+        var curPlayerIdx = 0
+        val roundOrderedCards = arrayOfNulls<Card>(4)
+        val roundCards = mutableListOf<Card>()
+        val seenCards = mutableSetOf<Card>()
         for (round in 1..8) {
-            println("Round $round")
             for (idx in startIdx until startIdx + 4) {
-                currentRoundCards[idx % 4] = players[idx % 4].play(currentRoundCards.filterNotNull())
-                // println("${idx % 4}  ${currentRoundCards[idx % 4]}")
+                curPlayerIdx = idx % 4
+                val selectedCard = minMax(curPlayerIdx, players[curPlayerIdx], roundCards, seenCards )
+                roundOrderedCards[curPlayerIdx] = selectedCard
+                roundCards.add(selectedCard)
+                players[curPlayerIdx].remove(selectedCard)
+                seenCards.add(selectedCard)
             }
-            printRoundCards(currentRoundCards  as Array<Card>, startIdx)
-            startIdx = dealer.getWinnerIdx(currentRoundCards as Array<Card>, startIdx)
-            println("Winner idx : $startIdx")
+            printRoundCards(roundOrderedCards  as Array<Card>, startIdx)
+            startIdx = dealer.scoreRound(roundOrderedCards as Array<Card>, startIdx)
+            Arrays.fill(roundOrderedCards, null)
+            roundCards.clear()
             println()
-            Arrays.fill(currentRoundCards, null)
         }
+        println(dealer.getScore())
     }
 
     private fun printRoundCards(cards: Array<Card>, startIdx: Int) {
@@ -56,16 +66,9 @@ class Baloot {
 
     private fun printCard(card: Card, idx: Any, startIdx: Int) {
         if (idx == startIdx) {
-            print("\u001b[31m" + card + "\u001b[0m")
+            print("\u001B[32m" + card + "\u001b[0m")
         } else {
             print(card)
         }
     }
-
-    private fun initPlayers(): Array<Player> {
-        return Array(4) {
-            Player()
-        }
-    }
-
 }
