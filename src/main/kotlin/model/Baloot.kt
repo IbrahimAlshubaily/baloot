@@ -1,5 +1,6 @@
 package model
 
+import java.lang.Exception
 import java.util.Arrays
 
 
@@ -16,7 +17,7 @@ class Baloot {
 
     private fun deal() {
         for (player in players) {
-            player.addAll(dealer.dealHand())
+            player.addAll(dealer.dealHand().sortedWith(compareBy(Card::suit, Card::value)))
         }
     }
     private fun rollOut() {
@@ -28,7 +29,11 @@ class Baloot {
         for (round in 1..8) {
             for (idx in startIdx until startIdx + 4) {
                 curPlayerIdx = idx % 4
-                val selectedCard = minMax(curPlayerIdx, players[curPlayerIdx], roundCards, seenCards )
+                val selectedCard = if (curPlayerIdx == 2) {
+                    selectCardFromConsole(players[curPlayerIdx], roundCards)
+                } else {
+                    minMax(curPlayerIdx, players[curPlayerIdx], roundCards, seenCards )
+                }
                 roundOrderedCards[curPlayerIdx] = selectedCard
                 roundCards.add(selectedCard)
                 players[curPlayerIdx].remove(selectedCard)
@@ -41,6 +46,29 @@ class Baloot {
             println()
         }
         println(dealer.getScore())
+    }
+
+    private fun readInt(): Int {
+        return try {
+            readln().split(' ').first().toInt()
+        } catch (e: Exception) {
+            readInt()
+        }
+
+    }
+
+    private fun selectCardFromConsole(cards: MutableSet<Card>, roundCards: MutableList<Card>): Card {
+        println(roundCards)
+        var tmp = cards.toList()
+        if (roundCards.isNotEmpty()) {
+            tmp = tmp.sortedBy { it.suit ==  roundCards[0].suit}.reversed()
+        }
+        var idx = 0
+        for (card in tmp) {
+            println(""+idx++ +": "+ card)
+        }
+        val cardIdx = readInt()
+        return tmp[cardIdx]
     }
 
     private fun printRoundCards(cards: Array<Card>, startIdx: Int) {
